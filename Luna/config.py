@@ -115,6 +115,13 @@ class LunaConfig:
     # ─────────────────────────────────────────────────────────────
     dtype: Literal["bf16", "fp16", "fp32"] = "bf16"   # precisão das ativações
     gradient_checkpointing: bool = True               # trade compute por VRAM
+        
+        # ── Dados ────────────────────────────────────────────────
+    # use_real_data=False -> usa dataset sintético (padrão aritmético)
+    # use_real_data=True  -> usa .bin/.idx reais do Megatron
+    use_real_data: bool = False
+    data_dir: str = ""
+    
 
         # ─────────────────────────────────────────────────────────────
     # VALIDAÇÃO

@@ -1,0 +1,49 @@
+# ═══════════════════════════════════════════════════════════════
+# Luna Mini — modelo de validação do pipeline.
+# Sem MoE, sem Butterfly. BitLinear ligado desde o início.
+# Alvo: ~11M params, roda em qualquer VRAM.
+#
+# Agora com dados REAIS do GigaVerbo curado e tokenizado.
+# ═══════════════════════════════════════════════════════════════
+
+name: luna_mini
+version: "1.1.0"
+
+# Núcleo
+d_model: 256
+n_layers: 4
+n_heads: 4
+max_seq_len: 512
+vocab_size: 32000
+dropout: 0.0
+
+# FFN denso (sem MoE)
+use_moe: false
+d_ff: 768
+
+# BitLinear ligado (é a arquitetura da Luna)
+use_bitlinear: true
+use_butterfly: false
+
+# Otimizador
+optimizer: lot
+lr: 3.0e-4
+weight_decay: 0.1
+betas: [0.9, 0.95]
+grad_clip: 1.0
+warmup_steps: 500
+
+# Treino
+batch_size: 8
+gradient_accumulation: 1
+max_steps: 20000
+eval_interval: 500
+save_interval: 1000
+
+# Precisão
+dtype: bf16
+gradient_checkpointing: true
+
+# Dados
+use_real_data: true
+data_dir: /workspace/Luna/data/processed/megatron

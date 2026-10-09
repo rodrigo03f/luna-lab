@@ -1,0 +1,8 @@
+{
+  "model_type": "gpt2",
+  "vocab_size": 32000,
+  "bos_token": "<bos>",
+  "eos_token": "<eos>",
+  "unk_token": "<unk>",
+  "pad_token": "<pad>"
+}

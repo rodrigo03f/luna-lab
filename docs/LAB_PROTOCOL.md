@@ -1,7 +1,7 @@
 # Protocolo do Laboratório Luna
 
-**Versão:** 1.0
-**Data:** 07/10/2026
+**Versão:** 1.1
+**Data:** 08/10/2026
 **Laboratório:** Dr. Rodrigo & Dr. Deep
 
 ---
@@ -39,7 +39,7 @@ Nada em experiments/ que não tenha objetivo.md e resultado.md.
 
 ---
 
-## As 6 Regras de Ouro
+## As 7 Regras de Ouro
 
 ### Regra 1 — Baseline funcional antes de qualquer otimização
 
@@ -78,6 +78,15 @@ Exceções iniciais (podem mudar conforme medição):
 - SIM: butterfly, BitLinear, MoE router, scan SSM
 - TALVEZ: SwiGLU, Attention (só se gargalar)
 - NÃO: RoPE, RMSNorm, Embedding, lm_head (custo/benefício ruim)
+
+### Regra 7 — Teste de mixed precision precisa checar corretude numérica
+
+Testes que rodam o modelo em bf16/fp16 devem verificar que a saída
+numérica continua correta, não só que a shape está certa.
+
+Bugs de "cast silencioso" (como complex64 -> bf16 descartando a parte
+imaginária do RoPE) só aparecem assim. Rodar com shape certo mas
+matemática errada é pior que falhar — dá falsa confiança.
 
 ---
 
@@ -153,3 +162,4 @@ disso, o foco é fazer a Luna existir, não documentar cada passo.
 | Versão | Data | Mudança |
 |---|---|---|
 | 1.0 | 07/10/2026 | Versão inicial |
+| 1.1 | 08/10/2026 | Adicionada Regra 7 (mixed precision + corretude numérica) |
