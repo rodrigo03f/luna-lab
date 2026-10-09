@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════
+# Luna Pequena — primeiro modelo com MoE.
+# Objetivo: validar roteamento, top-k e balanceamento de experts.
+# BitLinear ligado, Butterfly ainda desligado.
+# Alvo: ~60M params totais, ~30M ativos por token.
+# ═══════════════════════════════════════════════════════════════
+
+name: luna_pequena
+version: "1.0.0"
+
+# Núcleo
+d_model: 512
+n_layers: 6
+n_heads: 8
+max_seq_len: 1024
+vocab_size: 32000
+dropout: 0.0
+
+# MoE (a diferença da Pequena pra Mini)
+use_moe: true
+d_ff: 1536              # usado apenas se use_moe=False (não usado aqui)
+n_experts: 8
+top_k: 2
+d_ff_expert: 512        # FFN interno de cada expert
+
+# BitLinear ligado, Butterfly ainda desligado (vem na Média)
+use_bitlinear: true
+use_butterfly: false
+
+# Otimizador (LOT v2 aprovado no EXP_001)
+optimizer: lot
+lr: 3.0e-4
+weight_decay: 0.1
+betas: [0.9, 0.95]
+grad_clip: 1.0
+warmup_steps: 500
+
+# Treino
+batch_size: 4
+gradient_accumulation: 1
+max_steps: 20000
+eval_interval: 500
+save_interval: 1000
+
+# Precisão
+dtype: bf16
+gradient_checkpointing: true
+
+# Dados
+use_real_data: true
+data_dir: /workspace/Luna/data/processed/megatron

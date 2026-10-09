@@ -156,3 +156,43 @@ futuras registrado (int4, ternário+compensação).
 
 ---
 
+## [09/10/2026] — EXP_002 concluído: Luna Pequena com MoE aprovada
+
+**Objetivo:** primeira validação de MoE. Ver se roteamento, aux loss e
+balanceamento funcionam em escala real.
+
+**Config da Pequena:**
+- 60.46M params totais, 32.1M ativos por token
+- 6 layers, d_model=512, max_seq_len=1024
+- MoE: 8 experts, top_k=2, d_ff_expert=512
+- BitLinear ON, Butterfly OFF
+
+**Testes unitários (7/7 passaram):**
+- Forward preserva shape
+- Backward flui para TODOS os experts
+- Aux loss em range [1.0, 8.0] (medido: ~2.0 = distribuição quase uniforme)
+- Top-k ativa exatamente 2 experts por token
+- Modelo com MoE: 60.46M params, loss calcula
+- Modelo sem MoE (Mini): 11.60M params, zero regressão
+- CUDA + bf16: VRAM pico 287 MB
+
+**Treino (20000 steps, 98 min, dados reais):**
+- Loss inicial: 10.43 (aleatório)
+- Loss final: 4.29 (perplexidade 73)
+- Mini (comparação): loss 5.33 (perplexidade 206)
+- Redução de perplexidade vs Mini: 2.8x
+
+**Geração (qualitativa):**
+- Frases completas e gramaticalmente corretas
+- Pontuação estrutural correta (vírgulas, pontos, dois-pontos)
+- Vocabulário no campo semântico correto do prompt
+- Tom (jornalístico, acadêmico) muda conforme o prompt
+- Código ainda tratado como texto (só 30% do corpus era código)
+
+**Análise:** a Pequena cruzou a linha das "frases gramaticais completas".
+Não tem ainda coerência inter-parágrafo, mas cada frase faz sentido
+isoladamente. É "português correto sem tese única".
+
+**Decisão:** EXP_002 aprovado. Próximo: EXP_003 (Luna Média 180M com Butterfly).
+
+---

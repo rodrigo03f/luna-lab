@@ -88,6 +88,13 @@ class LunaConfig:
     use_butterfly: bool = False
 
     # ─────────────────────────────────────────────────────────────
+    # MoE — coeficiente da aux loss (Switch Transformer)
+    # 0.01 é o padrão do paper. Se os experts colapsarem (todos pro
+    # mesmo), aumenta. Se o treino ficar instável, diminui.
+    # ─────────────────────────────────────────────────────────────
+    moe_aux_loss_coef: float = 0.01
+
+    # ─────────────────────────────────────────────────────────────
     # OTIMIZADOR
     # "lot"         = Luna Ternary Optimizer (o nosso, oficial)
     # "adamw_fp32"  = controle experimental (baseline honesto)
@@ -345,12 +352,12 @@ class LunaConfig:
 
         # FFN
         if self.use_moe:
-            # Cada expert tem 2 matrizes: W1 [d, d_ff_expert] e W2 [d_ff_expert, d]
-            # Total = n_experts × 2 × d × d_ff_expert
-            ffn_total = self.n_experts * 2 * d * self.d_ff_expert
+            # SwiGLU usa 3 matrizes por expert: gate [d, d_ff], up [d, d_ff], down [d_ff, d]
+            # Total = n_experts × 3 × d × d_ff_expert
+            ffn_total = self.n_experts * 3 * d * self.d_ff_expert
 
             # Por token, só top_k experts são ativados.
-            ffn_active = self.top_k * 2 * d * self.d_ff_expert
+            ffn_active = self.top_k * 3 * d * self.d_ff_expert
         else:
             # FFN denso: 2 matrizes [d, d_ff] + [d_ff, d]
             ffn_total = 2 * d * self.d_ff
