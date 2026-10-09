@@ -126,3 +126,33 @@ semântica incoerente. Resultado MUITO acima do esperado para 11M params.
 **Decisão:** Fase 0 oficialmente completa. Próximo: EXP_001 (LOT).
 
 ---
+
+
+## [09/10/2026] — EXP_001 concluído: LOT aprovado
+
+**Objetivo:** validar o LOT (Luna Ternary Optimizer) contra AdamW fp32.
+
+**Método:** 3 iterações de design (v1.0 ternário puro, v1.1 ternário
+blockwise, v1.2 int8 blockwise), cada uma testada com 6 testes unitários.
+Vencedor (v1.2) virou kernel Triton (v2) e foi benchmarkado contra AdamW
+em 2000 steps na Luna Mini com dados reais.
+
+**Resultado:**
+- LOT v2 tem loss 8.3% MELHOR que AdamW (5.54 vs 6.00)
+- VRAM do otimizador 3.88x menor (11.41 MB vs 44.26 MB)
+- Velocidade praticamente igual (18.1 vs 17.6 st/s)
+- Kernel Triton: 8.28x speedup sobre PyTorch puro
+
+**Aprendizados:**
+- Ternário puro NÃO funciona para momentum (distribuição suave demais)
+- Int8 blockwise (Dettmers ICLR 2022) é o estado da arte por um motivo
+- Kernel Triton fundido recupera toda a velocidade perdida
+- Loss MELHOR que AdamW sugere regularização implícita da quantização
+
+**Decisão:** LOT v2 é o otimizador oficial da Luna. Backlog de otimizações
+futuras registrado (int4, ternário+compensação).
+
+**Próximo:** EXP_002 — Luna Pequena (60M params com MoE).
+
+---
+

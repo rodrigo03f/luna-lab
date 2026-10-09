@@ -33,7 +33,7 @@ import torch.nn as nn
 from config import LunaConfig
 from dataset import create_real_dataloader
 from model import LunaForCausalLM
-
+from optim.lot_triton import LOTTriton
 
 # ─────────────────────────────────────────────────────────────────
 # SCHEDULER DE LR
@@ -235,9 +235,13 @@ def build_optimizer(model: nn.Module, config: LunaConfig) -> torch.optim.Optimiz
     optimizer_name = config.optimizer
 
     if optimizer_name == "lot":
-        print("⚠️  LOT ainda não implementado. Caindo em AdamW fp32.")
-        print("    (Isso é esperado — EXP_001 vai implementar o LOT.)")
-        optimizer_name = "adamw_fp32"
+        print("Otimizador: LOT v2 (Luna Ternary Optimizer com kernel Triton)")
+        return LOTTriton(
+            model.parameters(),
+            lr=config.lr,
+            betas=config.betas,
+            weight_decay=config.weight_decay,
+        )
 
     if optimizer_name == "adamw_fp32":
         return torch.optim.AdamW(
